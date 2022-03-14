@@ -5,79 +5,74 @@ const substractButton = document.querySelector('.substract')
 const multiplyButton = document.querySelector('.multiply')
 const divideButton = document.querySelector('.divide')
 const equalButton = document.querySelector('.equal')
+const clearButton = document.querySelector('.clear')
 
-let currentValue = 0
-let operator
-let total = 0
+let currentValue = ''
+let operator = ''
 let firstValue = 0
 
+//const round = (value) => +value.toFixed(4)
+
 const showDisplay = (value) => {
+  //const rounded = round(value)
   display.textContent = value
 }
 
-showDisplay(currentValue)
+showDisplay(firstValue)
 
 const resetCurrentValue = () => (currentValue = '')
 
+const allClear = () => {
+  currentValue = 0
+  operator = ''
+  firstValue = 0
+  showDisplay(firstValue)
+}
+
 const storeValue = (e) => {
-  if (total === 0) resetCurrentValue()
   currentValue += e.target.textContent
   currentValue = Number(currentValue)
   showDisplay(currentValue)
 }
 
 const operations = {
-  add: () => {
-    total = firstValue + currentValue
-    showDisplay(total)
-    currentValue = total
-  },
-
-  substract: () => {
-    total = firstValue - currentValue
-    showDisplay(total)
-    currentValue = total
-  },
-
-  multiply: () => {
-    total = firstValue * currentValue
-    showDisplay(total)
-    currentValue = total
-  },
-
-  divide: () => {
-    total = firstValue / currentValue
-    showDisplay(total)
-    currentValue = total
-  },
+  add: () => firstValue + currentValue,
+  substract: () => firstValue - currentValue,
+  multiply: () => firstValue * currentValue,
+  divide: () => firstValue / currentValue,
 }
 
-const operate = (operator) => operations[operator]()
+const operate = (op) => {
+  if (currentValue === '') currentValue = firstValue
+
+  if (operator === '') {
+    operator = op
+    firstValue = currentValue
+    resetCurrentValue()
+    return
+  }
+
+  if (operator === 'divide' && currentValue === 0) {
+    showDisplay('LMAO')
+    return
+  }
+
+  firstValue = operations[operator]()
+  showDisplay(firstValue)
+  resetCurrentValue()
+  operator = op
+}
 
 numbers.forEach((number) => number.addEventListener('click', storeValue))
 
-addButton.addEventListener('click', () => {
-  operator = 'add'
-  firstValue = currentValue
-  resetCurrentValue()
-})
+addButton.addEventListener('click', () => operate('add'))
 
-substractButton.addEventListener('click', () => {
-  operator = 'substract'
-  firstValue = currentValue
-  resetCurrentValue()
-})
+substractButton.addEventListener('click', () => operate('substract'))
 
-multiplyButton.addEventListener('click', () => {
-  operator = 'multiply'
-  firstValue = currentValue
-  resetCurrentValue()
-})
+multiplyButton.addEventListener('click', () => operate('multiply'))
 
-divideButton.addEventListener('click', () => {
-  operator = 'divide'
-  firstValue = currentValue
-  resetCurrentValue()
-})
+divideButton.addEventListener('click', () => operate('divide'))
 
 equalButton.addEventListener('click', () => operate(operator))
+
+clearButton.addEventListener('click', () => allClear())
